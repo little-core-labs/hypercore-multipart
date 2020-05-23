@@ -19,6 +19,7 @@ const noop = () => void 0
  * @param {?(String)} opts.namespace The namespace used for key derivation. This is ignored if `opts.masterKey` is given
  * @param {?(Function)} opts.stat A function that should callback with the size of the source.
  * @param {Function} opts.read A function that accepts an offset and length and should callback with a buffer.
+ * @param {?(Function)} opts.onpage A function called upon cycling to a new page
  * @param {Function} callback
  */
 function multipart(opts, callback) {
@@ -28,6 +29,7 @@ function multipart(opts, callback) {
   const { bufferSize = DEFAULT_BUFFER_SIZE } = opts
   const { pageSize = DEFAULT_PAGE_SIZE } = opts
   const { stat = defaultStat } = opts
+  const { onpage = noop } = opts
   const { read = noop } = opts
   const { corestore } = opts
   const { masterKey = crypto.randomBytes(32) } = opts
@@ -110,7 +112,13 @@ function multipart(opts, callback) {
 
     getHypercore(page, (err, hypercore) => {
       if (err) { return callback(err) }
-      page = Math.floor(offset / pageSize) + 1
+      const newPage = Math.floor(offset / pageSize) + 1
+
+      if (newPage !== page) {
+        onpage(page, hypercore)
+      }
+
+      page = newPage
       hypercore.append(buffer, onappend)
     })
   }

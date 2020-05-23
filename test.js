@@ -42,12 +42,17 @@ test('multipart(opts, callback)', (t) => {
 
   const alice = Node(discoveryKey)
 
+  let i = 0
   const opts = {
     masterKey, read,
 
     bufferSize: 32,
     corestore: alice.corestore,
     pageSize: 256,
+    onpage(page, hypercore) {
+      t.equal(++i, page)
+      t.ok(hypercore)
+    }
   }
 
   const state = multipart(opts, onmultipart)

@@ -16,6 +16,9 @@ const opts = {
   bufferSize: 32,
   corestore: alice.corestore,
   pageSize: 256,
+  onpage(page, hypercore) {
+    console.log(page, hypercore);
+  }
 }
 
 multipart(opts, onmultipart)

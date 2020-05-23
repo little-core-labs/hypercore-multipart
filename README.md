@@ -49,8 +49,8 @@ an array of hypercore feeds. `opts` can be:
   namespace: 'multipart', // the namespace for key derivation
 
   read: null, // a function that accepts an offset, length, and callback to read bytes from a source
-  stat: null, // a function that explicitly resolves the size of the
-source
+  stat: null, // a function that explicitly resolves the size of the source
+  onpage(page, hypercore), // a function that is called upon cycling to a new page (hypercore)
 }
 ```
 
