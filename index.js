@@ -52,6 +52,7 @@ function multipart(opts, callback) {
 
   const hypercores = []
 
+  let prevPage = 0
   let blocks = 0
   let page = Math.floor(offset / pageSize) + 1
 
@@ -99,26 +100,37 @@ function multipart(opts, callback) {
   function onstats(err, res) {
     if (err) { return callback(err) }
     stats = res
-    read(offset, Math.min(pageSize, bufferSize), onread)
+
+    getHypercore(page, (err, hypercore) => {
+      if (err) { return callback(err) }
+      onpage(page, hypercore)
+      read(offset, Math.min(pageSize, bufferSize), onread)
+    })
   }
 
   function onread(err, buffer) {
     if (err) { return callback(err) }
-
-    const newPage = Math.floor(offset / pageSize) + 1
-
-    if (newPage !== page) {
-      onpage(page, hypercores[page - 1])
-    }
-
     if (!buffer || 0 === buffer.length) {
       return callback(null, hypercores)
     }
 
     offset = offset + buffer.length
 
+    if (prevPage && prevPage !== page) {
+      prevPage = page
+      getHypercore(prevPage, (err, newHypercore) => {
+        if (err) { return callback(err) }
+        onpage(prevPage, newHypercore)
+      })
+    }
+
     getHypercore(page, (err, hypercore) => {
       if (err) { return callback(err) }
+      const newPage = Math.floor(offset / pageSize) + 1
+
+      if (newPage !== page) {
+        prevPage = page
+      }
 
       page = newPage
       hypercore.append(buffer, onappend)
@@ -132,7 +144,7 @@ function multipart(opts, callback) {
       read(offset, Math.min(pageSize, bufferSize), onread)
     } else {
       // istanbul ignore next
-      callback(null, hypercores)
+      onread(null, null)
     }
   }
 
