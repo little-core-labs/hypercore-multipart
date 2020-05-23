@@ -104,6 +104,13 @@ function multipart(opts, callback) {
 
   function onread(err, buffer) {
     if (err) { return callback(err) }
+
+    const newPage = Math.floor(offset / pageSize) + 1
+
+    if (newPage !== page) {
+      onpage(page, hypercores[page - 1])
+    }
+
     if (!buffer || 0 === buffer.length) {
       return callback(null, hypercores)
     }
@@ -112,11 +119,6 @@ function multipart(opts, callback) {
 
     getHypercore(page, (err, hypercore) => {
       if (err) { return callback(err) }
-      const newPage = Math.floor(offset / pageSize) + 1
-
-      if (newPage !== page) {
-        onpage(page, hypercore)
-      }
 
       page = newPage
       hypercore.append(buffer, onappend)

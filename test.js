@@ -42,7 +42,7 @@ test('multipart(opts, callback)', (t) => {
 
   const alice = Node(discoveryKey)
 
-  let i = 0
+  let pages = 0
   const opts = {
     masterKey, read,
 
@@ -50,7 +50,7 @@ test('multipart(opts, callback)', (t) => {
     corestore: alice.corestore,
     pageSize: 256,
     onpage(page, hypercore) {
-      t.equal(++i, page)
+      t.equal(++pages, page)
       t.ok(hypercore)
     }
   }
@@ -88,6 +88,7 @@ test('multipart(opts, callback)', (t) => {
         batch(reads, (err, buffers) => {
           t.error(err)
           t.ok(0 === Buffer.compare(blob, Buffer.concat(buffers)))
+          t.equal(pages, parts.length)
           alice.close()
           bob.close()
           t.end()
