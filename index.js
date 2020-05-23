@@ -32,6 +32,7 @@ function multipart(opts, callback) {
   const { corestore } = opts
   const { masterKey = crypto.randomBytes(32) } = opts
   const { namespace = DEFAULT_NAMESPACE } = opts
+  let { stats = null } = opts
   let { offset = 0 } = opts
 
   assert(bufferSize > 0, 'Invalid `bufferSize` value. Expecting > 0')
@@ -50,7 +51,6 @@ function multipart(opts, callback) {
   const hypercores = []
 
   let blocks = 0
-  let stats = null
   let page = Math.floor(offset / pageSize) + 1
 
   corestore.ready(onready)
