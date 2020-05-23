@@ -59,6 +59,14 @@ function multipart(opts, callback) {
   corestore.ready(onready)
 
   return {
+    get pages() {
+      if (!stats || !stats.size) {
+        return hypercores.length
+      } else {
+        return Math.floor(stats.size / pageSize) + 1
+      }
+    },
+
     get bufferSize() {
       return bufferSize
     },
@@ -94,7 +102,11 @@ function multipart(opts, callback) {
 
   function onready(err) {
     if (err) { return callback(err) }
-    stat(onstats)
+    if (stats) {
+      onstats(null, stats)
+    } else {
+      stat(onstats)
+    }
   }
 
   function onstats(err, res) {
@@ -118,9 +130,9 @@ function multipart(opts, callback) {
 
     if (prevPage && prevPage !== page) {
       prevPage = page
-      getHypercore(prevPage, (err, newHypercore) => {
+      getHypercore(prevPage, (err, hypercore) => {
         if (err) { return callback(err) }
-        onpage(prevPage, newHypercore)
+        onpage(prevPage, hypercore)
       })
     }
 
