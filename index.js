@@ -169,7 +169,7 @@ function multipart(opts, callback) {
   function getHypercore(page, onhypercore) {
     const index = page - 1
     if (!hypercores[index]) {
-      const hypercore = createtHypercore(corestore, { namespace, masterKey, page })
+      const hypercore = createHypercore(corestore, { namespace, masterKey, pageSize, page })
       hypercore.page = page
       hypercores[index] = hypercore
     }
@@ -182,14 +182,14 @@ function defaultStat(callback) {
   callback(null, null)
 }
 
-function createtHypercore(corestore, opts) {
+function createHypercore(corestore, opts) {
   const { publicKey, secretKey } = keyPair(opts)
   return corestore.get({ keyPair: { publicKey, secretKey } })
 }
 
 function keyPair(opts) {
-  const { namespace = DEFAULT_NAMESPACE, masterKey, page } = opts
-  const seed = deriveKey(namespace, masterKey, String(page))
+  const { namespace = DEFAULT_NAMESPACE, masterKey, pageSize, page } = opts
+  const seed = deriveKey(namespace, masterKey, String(pageSize) + String(page))
   return crypto.keyPair(seed)
 }
 

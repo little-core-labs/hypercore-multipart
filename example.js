@@ -54,7 +54,9 @@ function onmultipart(err, parts) {
   const bob = Node(discoveryKey)
   bob.corestore.ready(() => {
     const keys = Array.from(Array(parts.length), (_, i) => multipart.keyPair({
-      masterKey, page: i + 1
+      masterKey,
+      pageSize: opts.pageSize,
+      page: i + 1
     }))
 
     const feeds = keys.map((kp) => bob.corestore.get({ key: kp.publicKey }))
