@@ -116,7 +116,13 @@ function multipart(opts, callback) {
     getHypercore(page, (err, hypercore) => {
       if (err) { return callback(err) }
       onpage(page, hypercore)
-      read(offset, Math.min(pageSize, bufferSize), onread)
+      let length = Math.min(pageSize, bufferSize)
+
+      if (stats && offset + length > stats.size) {
+        length = (offset + length) - ((offset + length) - stats.size)
+      }
+
+      read(offset, length, onread)
     })
   }
 
