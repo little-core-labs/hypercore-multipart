@@ -1,6 +1,6 @@
 {
   "name": "hypercore-multipart",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Partition bytes into several Hypercore feeds.",
   "main": "index.js",
   "scripts": {
